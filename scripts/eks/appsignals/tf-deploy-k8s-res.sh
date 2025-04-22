@@ -24,11 +24,6 @@ sleep 60s
 # Save the endpoint URL to a variable
 endpoint=$(kubectl get ingress -o json  --output jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}')
 
-# Print the endpoint
-echo "Started the traffic generator to send traffic to http://${endpoint}"
-
-kubectl ${OPERATION} -f ./sample-app/alb-ingress
-
 # Force rollout restart of all deployments to ensure they pick up the latest images
 echo "Forcing rollout restart of all deployments to ensure they use the latest images"
 kubectl rollout restart deployment --namespace=$NAMESPACE
