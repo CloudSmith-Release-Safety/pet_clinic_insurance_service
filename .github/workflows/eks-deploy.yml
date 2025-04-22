@@ -42,9 +42,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ env.AWS_REGION }}
-    
-      - name: Build Docker images
-        run: ./mvnw clean install -P buildDocker
         
       - name: Push Docker images to ECR
         run: |
