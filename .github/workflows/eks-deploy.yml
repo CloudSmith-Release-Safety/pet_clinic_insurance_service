@@ -47,6 +47,7 @@ jobs:
         run: |
           export ACCOUNT=$(aws sts get-caller-identity | jq .Account -r)
           export REGION=${{ env.AWS_REGION }}
+          export COMMIT_SHA=${{ github.sha }}
           ./push-ecr.sh
       
       - name: Create kubeconfig directory
