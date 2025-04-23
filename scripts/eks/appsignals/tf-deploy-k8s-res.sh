@@ -12,8 +12,6 @@ cd "$(dirname "$0")"
 host="petclinic-database.cufgmmyvvbb2.us-west-2.rds.amazonaws.com"
 port="5432"
 
-cd ../../scripts/eks/appsignals/
-
 for config in $(ls ./sample-app/*.yaml)
 do
     sed -e "s/111122223333.dkr.ecr.us-west-2/$ACCOUNT_ID.dkr.ecr.$REGION/g" -e 's#\${REGION}'"#${REGION}#g" -e 's#\${DB_SERVICE_HOST}'"#${host}#g" $config | kubectl -v=2 ${OPERATION} --namespace=$NAMESPACE -f -
