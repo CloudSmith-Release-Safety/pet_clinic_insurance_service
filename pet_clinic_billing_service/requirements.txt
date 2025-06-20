@@ -1,6 +1,0 @@
-boto3
-django
-psycopg2
-djangorestframework
-py_eureka_client
-requests
