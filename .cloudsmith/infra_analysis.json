@@ -1,0 +1,437 @@
+{
+  "org_name": "multi-repo-org",
+  "repo_name": "pet_clinic_insurance_service",
+  "repo_url": "https://github.com/multi-repo-org/pet_clinic_insurance_service",
+  "infrastructure_providers": [
+    {
+      "provider_id": "aws_secretsmanager_dbsecret",
+      "resource_type": "SecretsManager",
+      "resource_identifier": "petclinic-python-dbsecret",
+      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/settings.py",
+      "infrastructure_type": "SDK-Direct",
+      "description": "AWS Secrets Manager secret storing database credentials",
+      "interfaces": [
+        {
+          "interface_type": "api",
+          "endpoint_pattern": "secretsmanager.${region}.amazonaws.com",
+          "operations": ["GetSecretValue"],
+          "authentication": "IAM"
+        }
+      ],
+      "configuration": {
+        "secret_name": "petclinic-python-dbsecret",
+        "region_from_env": true,
+        "fallback_region": "us-east-1"
+      },
+      "environment_variables": ["SECRET_NAME", "REGION"],
+      "provider_type": "external"
+    },
+    {
+      "provider_id": "aws_ecr_repository",
+      "resource_type": "ECR",
+      "resource_identifier": "${account_id}.dkr.ecr.${region}.amazonaws.com/python-petclinic-billing-service",
+      "file_path": "push-ecr.sh",
+      "infrastructure_type": "SDK-Direct",
+      "description": "ECR repository for storing container images",
+      "interfaces": [
+        {
+          "interface_type": "api",
+          "endpoint_pattern": "ecr.${region}.amazonaws.com",
+          "operations": ["CreateRepository", "GetAuthorizationToken"],
+          "authentication": "IAM"
+        },
+        {
+          "interface_type": "registry",
+          "endpoint_pattern": "${account_id}.dkr.ecr.${region}.amazonaws.com",
+          "operations": ["PushImage", "PullImage"],
+          "authentication": "ECR Auth Token"
+        }
+      ],
+      "configuration": {
+        "repository_name": "python-petclinic-billing-service",
+        "image_tag_latest": true,
+        "image_tag_commit_sha": true
+      },
+      "environment_variables": ["ACCOUNT", "REGION", "REPOSITORY_PREFIX"],
+      "provider_type": "external"
+    },
+    {
+      "provider_id": "aws_eks_cluster",
+      "resource_type": "EKS",
+      "resource_identifier": "petclinic-demo",
+      "file_path": ".github/workflows/eks-deploy.yml",
+      "infrastructure_type": "SDK-Direct",
+      "description": "EKS cluster running the pet clinic microservices",
+      "interfaces": [
+        {
+          "interface_type": "api",
+          "endpoint_pattern": "eks.${region}.amazonaws.com",
+          "operations": ["DescribeCluster", "UpdateKubeconfig"],
+          "authentication": "IAM"
+        },
+        {
+          "interface_type": "kubernetes",
+          "endpoint_pattern": "https://api.${cluster_name}.${region}.eks.amazonaws.com",
+          "operations": ["Apply", "Get", "List", "Update", "Delete"],
+          "authentication": "IAM EKS Auth"
+        }
+      ],
+      "configuration": {
+        "cluster_name": "petclinic-demo",
+        "region": "us-west-2"
+      },
+      "environment_variables": ["AWS_REGION", "TF_VAR_cluster_name"],
+      "provider_type": "external"
+    },
+    {
+      "provider_id": "aws_rds_postgresql",
+      "resource_type": "RDS",
+      "resource_identifier": "petclinic-database.cufgmmyvvbb2.us-west-2.rds.amazonaws.com",
+      "file_path": "scripts/eks/appsignals/tf-deploy-k8s-res.sh",
+      "infrastructure_type": "SDK-Direct",
+      "description": "PostgreSQL RDS instance for application data storage",
+      "interfaces": [
+        {
+          "interface_type": "database",
+          "endpoint_pattern": "petclinic-database.cufgmmyvvbb2.us-west-2.rds.amazonaws.com:5432",
+          "operations": ["Connect", "Query", "Update", "Delete"],
+          "authentication": "Username/Password"
+        }
+      ],
+      "configuration": {
+        "host": "petclinic-database.cufgmmyvvbb2.us-west-2.rds.amazonaws.com",
+        "port": "5432",
+        "engine": "postgres"
+      },
+      "environment_variables": ["DB_SERVICE_HOST", "DB_SERVICE_PORT", "DB_NAME", "DB_USER"],
+      "provider_type": "external"
+    }
+  ],
+  "application_consumers": [
+    {
+      "consumer_id": "django_settings",
+      "component_type": "module",
+      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/settings.py",
+      "language": "Python",
+      "description": "Django settings module that configures database connection and retrieves credentials from AWS Secrets Manager",
+      "resource_discovery": {
+        "method": "environment variables",
+        "environment_variables": ["SECRET_NAME", "REGION", "DB_SERVICE_HOST", "DB_SERVICE_PORT", "DB_NAME", "DB_USER", "DB_USER_PASSWORD"]
+      },
+      "authentication": {
+        "method": "IAM role",
+        "role_references": ["AWS_ROLE_TO_ASSUME"]
+      },
+      "sdk_usage": {
+        "sdk_type": "boto3",
+        "clients": ["secretsmanager"]
+      },
+      "package_dependencies": ["boto3", "django", "psycopg2"],
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "resource_type": "SecretsManager",
+          "resource_name": "petclinic-python-dbsecret",
+          "repository": "unknown"
+        },
+        {
+          "resource_type": "RDS",
+          "resource_name": "petclinic-database",
+          "repository": "unknown"
+        }
+      ]
+    },
+    {
+      "consumer_id": "deployment_workflow",
+      "component_type": "workflow",
+      "file_path": ".github/workflows/eks-deploy.yml",
+      "language": "YAML",
+      "description": "GitHub Actions workflow that builds and deploys the application to EKS",
+      "resource_discovery": {
+        "method": "environment variables",
+        "environment_variables": ["AWS_REGION", "TF_VAR_cluster_name"]
+      },
+      "authentication": {
+        "method": "IAM role",
+        "role_references": ["AWS_ROLE_TO_ASSUME"]
+      },
+      "sdk_usage": {
+        "sdk_type": "aws-cli",
+        "clients": ["ecr", "eks", "sts"]
+      },
+      "package_dependencies": [],
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "resource_type": "EKS",
+          "resource_name": "petclinic-demo",
+          "repository": "unknown"
+        },
+        {
+          "resource_type": "ECR",
+          "resource_name": "python-petclinic-billing-service",
+          "repository": "unknown"
+        }
+      ]
+    },
+    {
+      "consumer_id": "ecr_push_script",
+      "component_type": "script",
+      "file_path": "push-ecr.sh",
+      "language": "Bash",
+      "description": "Script that authenticates with ECR, creates repository if needed, and pushes Docker images",
+      "resource_discovery": {
+        "method": "environment variables",
+        "environment_variables": ["ACCOUNT", "REGION", "REPOSITORY_PREFIX"]
+      },
+      "authentication": {
+        "method": "AWS CLI credentials"
+      },
+      "sdk_usage": {
+        "sdk_type": "aws-cli",
+        "clients": ["ecr"]
+      },
+      "package_dependencies": [],
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "resource_type": "ECR",
+          "resource_name": "python-petclinic-billing-service",
+          "repository": "unknown"
+        }
+      ]
+    },
+    {
+      "consumer_id": "k8s_deploy_script",
+      "component_type": "script",
+      "file_path": "scripts/eks/appsignals/tf-deploy-k8s-res.sh",
+      "language": "Bash",
+      "description": "Script that deploys Kubernetes resources to EKS cluster",
+      "resource_discovery": {
+        "method": "environment variables and script parameters",
+        "environment_variables": ["ACCOUNT_ID", "REGION", "NAMESPACE"]
+      },
+      "authentication": {
+        "method": "kubectl credentials"
+      },
+      "sdk_usage": {
+        "sdk_type": "aws-cli",
+        "clients": ["sts"]
+      },
+      "package_dependencies": [],
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "resource_type": "EKS",
+          "resource_name": "petclinic-demo",
+          "repository": "unknown"
+        },
+        {
+          "resource_type": "RDS",
+          "resource_name": "petclinic-database",
+          "repository": "unknown"
+        }
+      ]
+    },
+    {
+      "consumer_id": "insurance_api",
+      "component_type": "service",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
+      "language": "Python",
+      "description": "Django REST API service for insurance-related functionality",
+      "resource_discovery": {
+        "method": "imported from settings module",
+        "configuration_files": ["pet_clinic_insurance_service/settings.py"]
+      },
+      "authentication": {
+        "method": "database credentials from settings"
+      },
+      "sdk_usage": {},
+      "package_dependencies": ["django", "djangorestframework", "py_eureka_client"],
+      "internal_dependencies": [],
+      "external_dependencies": [
+        {
+          "resource_type": "RDS",
+          "resource_name": "petclinic-database",
+          "repository": "unknown"
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "connection_id": "settings_get_secrets",
+      "consumer_id": "django_settings",
+      "provider_id": "aws_secretsmanager_dbsecret",
+      "provider_resource_type": "SecretsManager",
+      "operation": "get_secret_value",
+      "access_type": "read",
+      "description": "Retrieve database credentials from AWS Secrets Manager",
+      "code_snippet": "client = boto3.client('secretsmanager', region_name=region_name)\nresponse = client.get_secret_value(SecretId=secret_name)",
+      "source_file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/settings.py",
+      "target_file_path": "N/A",
+      "configuration_source": "environment variable",
+      "criticality": "high",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "settings_connect_rds",
+      "consumer_id": "django_settings",
+      "provider_id": "aws_rds_postgresql",
+      "provider_resource_type": "RDS",
+      "operation": "connect",
+      "access_type": "read",
+      "description": "Configure Django database connection to PostgreSQL RDS",
+      "code_snippet": "\"postgresql\":{\n  \"ENGINE\": \"django.db.backends.postgresql\",\n  \"NAME\": os.environ.get('DB_NAME'),\n  \"USER\": os.environ.get('DB_USER'),\n  \"PASSWORD\": DB_PASSWORD,\n  \"HOST\": os.environ.get(\"DB_SERVICE_HOST\"),\n  \"PORT\": os.environ.get(\"DB_SERVICE_PORT\"),\n}",
+      "source_file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/settings.py",
+      "target_file_path": "N/A",
+      "configuration_source": "environment variable",
+      "criticality": "high",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "workflow_authenticate_ecr",
+      "consumer_id": "deployment_workflow",
+      "provider_id": "aws_ecr_repository",
+      "provider_resource_type": "ECR",
+      "operation": "login",
+      "access_type": "write",
+      "description": "Authenticate to ECR to push Docker images",
+      "code_snippet": "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${REPOSITORY_PREFIX}",
+      "source_file_path": "push-ecr.sh",
+      "target_file_path": "N/A",
+      "configuration_source": "environment variable",
+      "criticality": "high",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "workflow_create_ecr_repo",
+      "consumer_id": "ecr_push_script",
+      "provider_id": "aws_ecr_repository",
+      "provider_resource_type": "ECR",
+      "operation": "create_repository",
+      "access_type": "write",
+      "description": "Create ECR repository if it doesn't exist",
+      "code_snippet": "aws ecr create-repository --repository-name python-petclinic-billing-service --region ${REGION} --no-cli-pager || true",
+      "source_file_path": "push-ecr.sh",
+      "target_file_path": "N/A",
+      "configuration_source": "environment variable",
+      "criticality": "medium",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "workflow_push_ecr_images",
+      "consumer_id": "ecr_push_script",
+      "provider_id": "aws_ecr_repository",
+      "provider_resource_type": "ECR",
+      "operation": "push_image",
+      "access_type": "write",
+      "description": "Push Docker images to ECR repository",
+      "code_snippet": "docker push ${REPOSITORY_PREFIX}/python-petclinic-billing-service:latest\ndocker push ${REPOSITORY_PREFIX}/python-petclinic-billing-service:${COMMIT_SHA}",
+      "source_file_path": "push-ecr.sh",
+      "target_file_path": "N/A",
+      "configuration_source": "environment variable",
+      "criticality": "high",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "workflow_configure_eks",
+      "consumer_id": "deployment_workflow",
+      "provider_id": "aws_eks_cluster",
+      "provider_resource_type": "EKS",
+      "operation": "update_kubeconfig",
+      "access_type": "read",
+      "description": "Update kubeconfig to connect to EKS cluster",
+      "code_snippet": "aws eks update-kubeconfig --name ${{ env.TF_VAR_cluster_name }} --region ${{ env.AWS_REGION }} --alias ${{ env.TF_VAR_cluster_name }}",
+      "source_file_path": ".github/workflows/eks-deploy.yml",
+      "target_file_path": "N/A",
+      "configuration_source": "environment variable",
+      "criticality": "high",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "k8s_script_deploy",
+      "consumer_id": "k8s_deploy_script",
+      "provider_id": "aws_eks_cluster",
+      "provider_resource_type": "EKS",
+      "operation": "apply",
+      "access_type": "write",
+      "description": "Deploy Kubernetes resources to EKS cluster",
+      "code_snippet": "sed -e \"s/111122223333.dkr.ecr.us-west-2/$ACCOUNT_ID.dkr.ecr.$REGION/g\" -e 's#\\${REGION}'\"#${REGION}#g\" -e 's#\\${DB_SERVICE_HOST}'\"#${host}#g\" $config | kubectl -v=2 ${OPERATION} --namespace=$NAMESPACE -f -",
+      "source_file_path": "scripts/eks/appsignals/tf-deploy-k8s-res.sh",
+      "target_file_path": "N/A",
+      "configuration_source": "script parameters",
+      "criticality": "high",
+      "connection_type": "direct",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "insurance_api_db_access",
+      "consumer_id": "insurance_api",
+      "provider_id": "aws_rds_postgresql",
+      "provider_resource_type": "RDS",
+      "operation": "query",
+      "access_type": "read",
+      "description": "Insurance API service accessing RDS PostgreSQL database",
+      "code_snippet": "queryset = Insurance.objects.all()",
+      "source_file_path": "pet_clinic_insurance_service/service/views.py",
+      "target_file_path": "N/A",
+      "configuration_source": "settings module",
+      "criticality": "high",
+      "connection_type": "indirect",
+      "cross_repo": true
+    },
+    {
+      "connection_id": "insurance_api_db_write",
+      "consumer_id": "insurance_api",
+      "provider_id": "aws_rds_postgresql",
+      "provider_resource_type": "RDS",
+      "operation": "update",
+      "access_type": "write",
+      "description": "Insurance API service writing to RDS PostgreSQL database",
+      "code_snippet": "serializer.save()",
+      "source_file_path": "pet_clinic_insurance_service/service/views.py",
+      "target_file_path": "N/A",
+      "configuration_source": "settings module",
+      "criticality": "high",
+      "connection_type": "indirect",
+      "cross_repo": true
+    }
+  ],
+  "architecture": {
+    "application_type": "microservice",
+    "infrastructure_pattern": "container-based",
+    "deployment_approach": "CI/CD with GitHub Actions",
+    "configuration_management": "environment variables with AWS Secrets Manager",
+    "critical_paths": [
+      {
+        "path_name": "insurance_service_database_access",
+        "description": "Insurance service accessing PostgreSQL database through Django ORM",
+        "involved_components": ["django_settings", "aws_rds_postgresql", "insurance_api"]
+      },
+      {
+        "path_name": "deployment_pipeline",
+        "description": "CI/CD pipeline for building and deploying to EKS",
+        "involved_components": ["deployment_workflow", "ecr_push_script", "aws_ecr_repository", "aws_eks_cluster", "k8s_deploy_script"]
+      }
+    ],
+    "security_model": {
+      "authentication": "IAM roles with GitHub OIDC integration for CI/CD",
+      "authorization": "Role-based access with least privilege",
+      "data_protection": "Secured database credentials via AWS Secrets Manager"
+    },
+    "cross_repo_dependencies": {
+      "provides_to": [],
+      "consumes_from": [
+        {"repository": "unknown", "resources": ["aws_secretsmanager_dbsecret", "aws_ecr_repository", "aws_eks_cluster", "aws_rds_postgresql"]}
+      ],
+      "shared_infrastructure": true
+    }
+  }
+}
