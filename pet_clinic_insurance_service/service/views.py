@@ -29,7 +29,7 @@ class PetInsuranceViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer, owner_id)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return []
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
