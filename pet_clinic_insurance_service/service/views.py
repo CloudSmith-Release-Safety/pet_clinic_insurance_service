@@ -14,7 +14,7 @@ class InsuranceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         if not queryset:
-            return Response({"error": "Not Found", "message": "No insurance records found"}, status=status.HTTP_404_NOT_FOUND)
+            return []
         return queryset
 
 
