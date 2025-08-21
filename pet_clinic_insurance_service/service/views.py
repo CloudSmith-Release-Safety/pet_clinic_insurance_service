@@ -58,3 +58,23 @@ class PetInsuranceViewSet(viewsets.ModelViewSet):
 class HealthViewSet(viewsets.ViewSet):
     def list(self, request):
         return Response({'message':'ok'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def create_claim(request):
+    """Create a new insurance claim in DynamoDB"""
+    try:
+        dynamodb = boto3.resource('dynamodb', region_name='us-west-2')
+        table = dynamodb.Table('InsuranceClaims')
+        
+        claim_data = {
+            'claimId': request.data.get('claim_id'),
+            'ownerId': request.data.get('owner_id'),
+            'petId': request.data.get('pet_id'),
+            'amount': request.data.get('amount'),
+            'status': 'pending'
+        }
+        
+        table.put_item(Item=claim_data)
+        return Response(claim_data, status=201)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
