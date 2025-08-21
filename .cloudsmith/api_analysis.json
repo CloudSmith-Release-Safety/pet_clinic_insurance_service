@@ -8,8 +8,8 @@
       "endpoint": "/insurances",
       "method": "GET",
       "service_name": "InsuranceService",
-      "description": "Lists all insurance plans",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "description": "Retrieves a list of all available insurance plans",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "responses": {
         "200": {
           "description": "List of insurance plans",
@@ -22,8 +22,19 @@
                 "id": "integer",
                 "name": "string",
                 "description": "string",
-                "price": "decimal"
+                "price": "number"
               }
+            }
+          }
+        },
+        "404": {
+          "description": "No insurance records found",
+          "content_type": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": "string",
+              "message": "string"
             }
           }
         }
@@ -35,14 +46,14 @@
       "method": "GET",
       "service_name": "InsuranceService",
       "description": "Retrieves details of a specific insurance plan",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
           {
             "name": "id",
             "type": "integer",
             "required": true,
-            "description": "Insurance plan ID"
+            "description": "Unique identifier for the insurance plan"
           }
         ]
       },
@@ -56,12 +67,13 @@
               "id": "integer",
               "name": "string",
               "description": "string",
-              "price": "decimal"
+              "price": "number"
             }
           }
         },
         "404": {
-          "description": "Insurance plan not found"
+          "description": "Insurance plan not found",
+          "content_type": "application/json"
         }
       }
     },
@@ -71,7 +83,7 @@
       "method": "POST",
       "service_name": "InsuranceService",
       "description": "Creates a new insurance plan",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "body": {
           "type": "object",
@@ -86,10 +98,10 @@
             "description": {
               "type": "string",
               "required": true,
-              "description": "Description of the insurance plan"
+              "description": "Detailed description of the insurance plan"
             },
             "price": {
-              "type": "decimal",
+              "type": "number",
               "required": true,
               "description": "Price of the insurance plan"
             }
@@ -98,7 +110,7 @@
       },
       "responses": {
         "201": {
-          "description": "Insurance plan created",
+          "description": "Insurance plan created successfully",
           "content_type": "application/json",
           "schema": {
             "type": "object",
@@ -106,12 +118,13 @@
               "id": "integer",
               "name": "string",
               "description": "string",
-              "price": "decimal"
+              "price": "number"
             }
           }
         },
         "400": {
-          "description": "Invalid input data"
+          "description": "Invalid request data",
+          "content_type": "application/json"
         }
       }
     },
@@ -121,20 +134,20 @@
       "method": "PUT",
       "service_name": "InsuranceService",
       "description": "Updates an existing insurance plan",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
           {
             "name": "id",
             "type": "integer",
             "required": true,
-            "description": "Insurance plan ID"
+            "description": "Unique identifier for the insurance plan"
           }
         ],
         "body": {
           "type": "object",
           "required": true,
-          "description": "Insurance plan details to update",
+          "description": "Updated insurance plan details",
           "properties": {
             "name": {
               "type": "string",
@@ -144,10 +157,10 @@
             "description": {
               "type": "string",
               "required": false,
-              "description": "Description of the insurance plan"
+              "description": "Detailed description of the insurance plan"
             },
             "price": {
-              "type": "decimal",
+              "type": "number",
               "required": false,
               "description": "Price of the insurance plan"
             }
@@ -156,14 +169,25 @@
       },
       "responses": {
         "200": {
-          "description": "Insurance plan updated",
-          "content_type": "application/json"
+          "description": "Insurance plan updated successfully",
+          "content_type": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": "integer",
+              "name": "string",
+              "description": "string",
+              "price": "number"
+            }
+          }
         },
         "400": {
-          "description": "Invalid input data"
+          "description": "Invalid request data",
+          "content_type": "application/json"
         },
         "404": {
-          "description": "Insurance plan not found"
+          "description": "Insurance plan not found",
+          "content_type": "application/json"
         }
       }
     },
@@ -173,23 +197,24 @@
       "method": "DELETE",
       "service_name": "InsuranceService",
       "description": "Deletes an insurance plan",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
           {
             "name": "id",
             "type": "integer",
             "required": true,
-            "description": "Insurance plan ID"
+            "description": "Unique identifier for the insurance plan"
           }
         ]
       },
       "responses": {
         "204": {
-          "description": "Insurance plan deleted"
+          "description": "Insurance plan deleted successfully"
         },
         "404": {
-          "description": "Insurance plan not found"
+          "description": "Insurance plan not found",
+          "content_type": "application/json"
         }
       }
     },
@@ -198,11 +223,11 @@
       "endpoint": "/pet-insurances",
       "method": "GET",
       "service_name": "PetInsuranceService",
-      "description": "Lists all pet insurance plans",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "description": "Retrieves a list of all pet insurance registrations",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "responses": {
         "200": {
-          "description": "List of pet insurance plans",
+          "description": "List of pet insurance registrations",
           "content_type": "application/json",
           "schema": {
             "type": "array",
@@ -213,7 +238,7 @@
                 "pet_id": "integer",
                 "insurance_id": "integer",
                 "insurance_name": "string",
-                "price": "decimal"
+                "price": "number"
               }
             }
           }
@@ -226,14 +251,14 @@
       "method": "GET",
       "service_name": "PetInsuranceService",
       "description": "Retrieves insurance details for a specific pet",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
           {
             "name": "pet_id",
             "type": "integer",
             "required": true,
-            "description": "Pet ID"
+            "description": "Unique identifier for the pet"
           }
         ]
       },
@@ -248,12 +273,13 @@
               "pet_id": "integer",
               "insurance_id": "integer",
               "insurance_name": "string",
-              "price": "decimal"
+              "price": "number"
             }
           }
         },
         "404": {
-          "description": "Pet insurance not found"
+          "description": "Pet insurance not found",
+          "content_type": "application/json"
         }
       }
     },
@@ -262,8 +288,8 @@
       "endpoint": "/pet-insurances",
       "method": "POST",
       "service_name": "PetInsuranceService",
-      "description": "Creates a new insurance for a pet",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "description": "Creates a new pet insurance registration",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "body": {
           "type": "object",
@@ -273,17 +299,17 @@
             "pet_id": {
               "type": "integer",
               "required": true,
-              "description": "ID of the pet"
+              "description": "Unique identifier for the pet"
             },
             "owner_id": {
               "type": "integer",
               "required": true,
-              "description": "ID of the pet owner"
+              "description": "Unique identifier for the pet owner"
             },
             "insurance_id": {
               "type": "integer",
               "required": true,
-              "description": "ID of the insurance plan"
+              "description": "Identifier of the insurance plan"
             },
             "insurance_name": {
               "type": "string",
@@ -291,7 +317,7 @@
               "description": "Name of the insurance plan"
             },
             "price": {
-              "type": "decimal",
+              "type": "number",
               "required": true,
               "description": "Price of the insurance plan"
             }
@@ -300,7 +326,7 @@
       },
       "responses": {
         "201": {
-          "description": "Pet insurance created",
+          "description": "Pet insurance created successfully",
           "content_type": "application/json",
           "schema": {
             "type": "object",
@@ -309,12 +335,13 @@
               "pet_id": "integer",
               "insurance_id": "integer",
               "insurance_name": "string",
-              "price": "decimal"
+              "price": "number"
             }
           }
         },
         "400": {
-          "description": "Invalid input data"
+          "description": "Invalid request data",
+          "content_type": "application/json"
         }
       }
     },
@@ -323,31 +350,31 @@
       "endpoint": "/pet-insurances/{pet_id}",
       "method": "PUT",
       "service_name": "PetInsuranceService",
-      "description": "Updates insurance for a specific pet",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "description": "Updates an existing pet insurance registration",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
           {
             "name": "pet_id",
             "type": "integer",
             "required": true,
-            "description": "Pet ID"
+            "description": "Unique identifier for the pet"
           }
         ],
         "body": {
           "type": "object",
           "required": true,
-          "description": "Pet insurance details to update",
+          "description": "Updated pet insurance details",
           "properties": {
             "owner_id": {
               "type": "integer",
               "required": true,
-              "description": "ID of the pet owner"
+              "description": "Unique identifier for the pet owner"
             },
             "insurance_id": {
               "type": "integer",
               "required": false,
-              "description": "ID of the insurance plan"
+              "description": "Identifier of the insurance plan"
             },
             "insurance_name": {
               "type": "string",
@@ -355,7 +382,7 @@
               "description": "Name of the insurance plan"
             },
             "price": {
-              "type": "decimal",
+              "type": "number",
               "required": false,
               "description": "Price of the insurance plan"
             }
@@ -364,14 +391,26 @@
       },
       "responses": {
         "200": {
-          "description": "Pet insurance updated",
-          "content_type": "application/json"
+          "description": "Pet insurance updated successfully",
+          "content_type": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "id": "integer",
+              "pet_id": "integer",
+              "insurance_id": "integer",
+              "insurance_name": "string",
+              "price": "number"
+            }
+          }
         },
         "400": {
-          "description": "Invalid input data"
+          "description": "Invalid request data",
+          "content_type": "application/json"
         },
         "404": {
-          "description": "Pet insurance not found"
+          "description": "Pet insurance not found",
+          "content_type": "application/json"
         }
       }
     },
@@ -380,24 +419,25 @@
       "endpoint": "/pet-insurances/{pet_id}",
       "method": "DELETE",
       "service_name": "PetInsuranceService",
-      "description": "Deletes insurance for a specific pet",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "description": "Deletes a pet insurance registration",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
           {
             "name": "pet_id",
             "type": "integer",
             "required": true,
-            "description": "Pet ID"
+            "description": "Unique identifier for the pet"
           }
         ]
       },
       "responses": {
         "204": {
-          "description": "Pet insurance deleted"
+          "description": "Pet insurance deleted successfully"
         },
         "404": {
-          "description": "Pet insurance not found"
+          "description": "Pet insurance not found",
+          "content_type": "application/json"
         }
       }
     },
@@ -406,8 +446,8 @@
       "endpoint": "/health",
       "method": "GET",
       "service_name": "InsuranceService",
-      "description": "Health check endpoint",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/views.py",
+      "description": "Health check endpoint for the service",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
       "responses": {
         "200": {
           "description": "Service is healthy",
@@ -425,13 +465,13 @@
   "consumed_apis": [
     {
       "type": "rest",
-      "service": "CustomersService",
+      "service": "CustomerService",
       "endpoint": "/owner/{owner_id}",
       "method": "GET",
       "description": "Retrieves owner information by ID",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/rest.py",
+      "file_path": "pet_clinic_insurance_service/service/rest.py",
       "expected_response": {
-        "owner_data": "object"
+        "owner_details": "object"
       }
     },
     {
@@ -439,10 +479,10 @@
       "service": "BillingService",
       "endpoint": "/billings/{owner_id}/{pet_id}/{type}",
       "method": "GET",
-      "description": "Checks if a billing record exists for a specific pet, owner, and insurance type",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/rest.py",
+      "description": "Checks if billing exists for a specific pet and insurance type",
+      "file_path": "pet_clinic_insurance_service/service/rest.py",
       "expected_response": {
-        "billing_data": "object"
+        "billing_details": "object"
       }
     },
     {
@@ -450,14 +490,14 @@
       "service": "BillingService",
       "endpoint": "/billings",
       "method": "POST",
-      "description": "Creates a new billing record",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/rest.py",
+      "description": "Creates a new billing entry for pet insurance",
+      "file_path": "pet_clinic_insurance_service/service/rest.py",
       "request_payload": {
         "owner_id": "integer",
         "type": "string",
         "type_name": "string",
         "pet_id": "integer",
-        "payment": "decimal",
+        "payment": "number",
         "status": "string"
       }
     },
@@ -466,16 +506,11 @@
       "service": "BillingService",
       "endpoint": "/billings/{id}",
       "method": "PUT",
-      "description": "Updates an existing billing record",
-      "file_path": "pet_clinic_insurance_service/pet_clinic_insurance_service/service/rest.py",
+      "description": "Updates an existing billing entry",
+      "file_path": "pet_clinic_insurance_service/service/rest.py",
       "request_payload": {
-        "id": "integer",
-        "owner_id": "integer",
-        "type": "string",
-        "type_name": "string",
-        "pet_id": "integer",
-        "payment": "decimal",
-        "status": "string"
+        "payment": "number",
+        "other_fields": "object"
       }
     }
   ]
