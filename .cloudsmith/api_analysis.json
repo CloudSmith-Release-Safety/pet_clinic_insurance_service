@@ -10,6 +10,7 @@
       "service_name": "InsuranceService",
       "description": "Retrieves a list of all available insurance plans",
       "file_path": "pet_clinic_insurance_service/service/views.py",
+      "parameters": {},
       "responses": {
         "200": {
           "description": "List of insurance plans",
@@ -22,7 +23,7 @@
                 "id": "integer",
                 "name": "string",
                 "description": "string",
-                "price": "number"
+                "price": "decimal"
               }
             }
           }
@@ -45,7 +46,7 @@
       "endpoint": "/insurances/{id}",
       "method": "GET",
       "service_name": "InsuranceService",
-      "description": "Retrieves details of a specific insurance plan",
+      "description": "Retrieves a specific insurance plan by ID",
       "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
@@ -53,7 +54,7 @@
             "name": "id",
             "type": "integer",
             "required": true,
-            "description": "Unique identifier for the insurance plan"
+            "description": "Unique identifier of the insurance plan"
           }
         ]
       },
@@ -67,7 +68,7 @@
               "id": "integer",
               "name": "string",
               "description": "string",
-              "price": "number"
+              "price": "decimal"
             }
           }
         },
@@ -98,10 +99,10 @@
             "description": {
               "type": "string",
               "required": true,
-              "description": "Detailed description of the insurance plan"
+              "description": "Description of the insurance plan"
             },
             "price": {
-              "type": "number",
+              "type": "decimal",
               "required": true,
               "description": "Price of the insurance plan"
             }
@@ -118,7 +119,7 @@
               "id": "integer",
               "name": "string",
               "description": "string",
-              "price": "number"
+              "price": "decimal"
             }
           }
         },
@@ -141,7 +142,7 @@
             "name": "id",
             "type": "integer",
             "required": true,
-            "description": "Unique identifier for the insurance plan"
+            "description": "Unique identifier of the insurance plan"
           }
         ],
         "body": {
@@ -157,10 +158,10 @@
             "description": {
               "type": "string",
               "required": false,
-              "description": "Detailed description of the insurance plan"
+              "description": "Description of the insurance plan"
             },
             "price": {
-              "type": "number",
+              "type": "decimal",
               "required": false,
               "description": "Price of the insurance plan"
             }
@@ -177,7 +178,7 @@
               "id": "integer",
               "name": "string",
               "description": "string",
-              "price": "number"
+              "price": "decimal"
             }
           }
         },
@@ -204,7 +205,7 @@
             "name": "id",
             "type": "integer",
             "required": true,
-            "description": "Unique identifier for the insurance plan"
+            "description": "Unique identifier of the insurance plan"
           }
         ]
       },
@@ -222,12 +223,13 @@
       "type": "rest",
       "endpoint": "/pet-insurances",
       "method": "GET",
-      "service_name": "PetInsuranceService",
-      "description": "Retrieves a list of all pet insurance registrations",
+      "service_name": "InsuranceService",
+      "description": "Retrieves a list of all pet insurance records",
       "file_path": "pet_clinic_insurance_service/service/views.py",
+      "parameters": {},
       "responses": {
         "200": {
-          "description": "List of pet insurance registrations",
+          "description": "List of pet insurance records",
           "content_type": "application/json",
           "schema": {
             "type": "array",
@@ -238,7 +240,7 @@
                 "pet_id": "integer",
                 "insurance_id": "integer",
                 "insurance_name": "string",
-                "price": "number"
+                "price": "decimal"
               }
             }
           }
@@ -249,8 +251,8 @@
       "type": "rest",
       "endpoint": "/pet-insurances/{pet_id}",
       "method": "GET",
-      "service_name": "PetInsuranceService",
-      "description": "Retrieves insurance details for a specific pet",
+      "service_name": "InsuranceService",
+      "description": "Retrieves insurance information for a specific pet",
       "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
@@ -258,7 +260,7 @@
             "name": "pet_id",
             "type": "integer",
             "required": true,
-            "description": "Unique identifier for the pet"
+            "description": "Unique identifier of the pet"
           }
         ]
       },
@@ -273,7 +275,7 @@
               "pet_id": "integer",
               "insurance_id": "integer",
               "insurance_name": "string",
-              "price": "number"
+              "price": "decimal"
             }
           }
         },
@@ -287,8 +289,8 @@
       "type": "rest",
       "endpoint": "/pet-insurances",
       "method": "POST",
-      "service_name": "PetInsuranceService",
-      "description": "Creates a new pet insurance registration",
+      "service_name": "InsuranceService",
+      "description": "Creates a new pet insurance record and generates billing",
       "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "body": {
@@ -299,12 +301,12 @@
             "pet_id": {
               "type": "integer",
               "required": true,
-              "description": "Unique identifier for the pet"
+              "description": "Unique identifier of the pet"
             },
             "owner_id": {
               "type": "integer",
               "required": true,
-              "description": "Unique identifier for the pet owner"
+              "description": "Unique identifier of the pet owner"
             },
             "insurance_id": {
               "type": "integer",
@@ -317,9 +319,9 @@
               "description": "Name of the insurance plan"
             },
             "price": {
-              "type": "number",
+              "type": "decimal",
               "required": true,
-              "description": "Price of the insurance plan"
+              "description": "Price of the insurance"
             }
           }
         }
@@ -335,7 +337,7 @@
               "pet_id": "integer",
               "insurance_id": "integer",
               "insurance_name": "string",
-              "price": "number"
+              "price": "decimal"
             }
           }
         },
@@ -349,8 +351,8 @@
       "type": "rest",
       "endpoint": "/pet-insurances/{pet_id}",
       "method": "PUT",
-      "service_name": "PetInsuranceService",
-      "description": "Updates an existing pet insurance registration",
+      "service_name": "InsuranceService",
+      "description": "Updates an existing pet insurance record and regenerates billing",
       "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
@@ -358,7 +360,7 @@
             "name": "pet_id",
             "type": "integer",
             "required": true,
-            "description": "Unique identifier for the pet"
+            "description": "Unique identifier of the pet"
           }
         ],
         "body": {
@@ -369,7 +371,7 @@
             "owner_id": {
               "type": "integer",
               "required": true,
-              "description": "Unique identifier for the pet owner"
+              "description": "Unique identifier of the pet owner"
             },
             "insurance_id": {
               "type": "integer",
@@ -382,9 +384,9 @@
               "description": "Name of the insurance plan"
             },
             "price": {
-              "type": "number",
+              "type": "decimal",
               "required": false,
-              "description": "Price of the insurance plan"
+              "description": "Price of the insurance"
             }
           }
         }
@@ -400,7 +402,7 @@
               "pet_id": "integer",
               "insurance_id": "integer",
               "insurance_name": "string",
-              "price": "number"
+              "price": "decimal"
             }
           }
         },
@@ -418,8 +420,8 @@
       "type": "rest",
       "endpoint": "/pet-insurances/{pet_id}",
       "method": "DELETE",
-      "service_name": "PetInsuranceService",
-      "description": "Deletes a pet insurance registration",
+      "service_name": "InsuranceService",
+      "description": "Deletes a pet insurance record",
       "file_path": "pet_clinic_insurance_service/service/views.py",
       "parameters": {
         "path": [
@@ -427,7 +429,7 @@
             "name": "pet_id",
             "type": "integer",
             "required": true,
-            "description": "Unique identifier for the pet"
+            "description": "Unique identifier of the pet"
           }
         ]
       },
@@ -446,8 +448,9 @@
       "endpoint": "/health",
       "method": "GET",
       "service_name": "InsuranceService",
-      "description": "Health check endpoint for the service",
+      "description": "Health check endpoint to verify service status",
       "file_path": "pet_clinic_insurance_service/service/views.py",
+      "parameters": {},
       "responses": {
         "200": {
           "description": "Service is healthy",
@@ -460,18 +463,87 @@
           }
         }
       }
+    },
+    {
+      "type": "rest",
+      "endpoint": "/create-claim",
+      "method": "POST",
+      "service_name": "InsuranceService",
+      "description": "Creates a new insurance claim in DynamoDB",
+      "file_path": "pet_clinic_insurance_service/service/views.py",
+      "parameters": {
+        "body": {
+          "type": "object",
+          "required": true,
+          "description": "Insurance claim details",
+          "properties": {
+            "claim_id": {
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the claim"
+            },
+            "owner_id": {
+              "type": "string",
+              "required": true,
+              "description": "Identifier of the pet owner"
+            },
+            "pet_id": {
+              "type": "string",
+              "required": true,
+              "description": "Identifier of the pet"
+            },
+            "amount": {
+              "type": "decimal",
+              "required": true,
+              "description": "Claim amount"
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Claim created successfully",
+          "content_type": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "claimId": "string",
+              "ownerId": "string",
+              "petId": "string",
+              "amount": "decimal",
+              "status": "string"
+            }
+          }
+        },
+        "400": {
+          "description": "Error creating claim",
+          "content_type": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": "string"
+            }
+          }
+        }
+      }
     }
   ],
   "consumed_apis": [
     {
       "type": "rest",
-      "service": "CustomerService",
+      "service": "CustomersService",
       "endpoint": "/owner/{owner_id}",
       "method": "GET",
-      "description": "Retrieves owner information by ID",
+      "description": "Gets owner information from the customer service",
       "file_path": "pet_clinic_insurance_service/service/rest.py",
       "expected_response": {
-        "owner_details": "object"
+        "owner": {
+          "id": "integer",
+          "name": "string",
+          "address": "string",
+          "city": "string",
+          "telephone": "string"
+        }
       }
     },
     {
@@ -479,10 +551,16 @@
       "service": "BillingService",
       "endpoint": "/billings/{owner_id}/{pet_id}/{type}",
       "method": "GET",
-      "description": "Checks if billing exists for a specific pet and insurance type",
+      "description": "Checks if a billing record exists for a specific pet insurance",
       "file_path": "pet_clinic_insurance_service/service/rest.py",
       "expected_response": {
-        "billing_details": "object"
+        "id": "integer",
+        "owner_id": "integer",
+        "pet_id": "integer",
+        "type": "string",
+        "type_name": "string",
+        "payment": "decimal",
+        "status": "string"
       }
     },
     {
@@ -490,14 +568,14 @@
       "service": "BillingService",
       "endpoint": "/billings",
       "method": "POST",
-      "description": "Creates a new billing entry for pet insurance",
+      "description": "Creates a new billing record for pet insurance",
       "file_path": "pet_clinic_insurance_service/service/rest.py",
       "request_payload": {
         "owner_id": "integer",
         "type": "string",
         "type_name": "string",
         "pet_id": "integer",
-        "payment": "number",
+        "payment": "decimal",
         "status": "string"
       }
     },
@@ -506,11 +584,15 @@
       "service": "BillingService",
       "endpoint": "/billings/{id}",
       "method": "PUT",
-      "description": "Updates an existing billing entry",
+      "description": "Updates an existing billing record for pet insurance",
       "file_path": "pet_clinic_insurance_service/service/rest.py",
       "request_payload": {
-        "payment": "number",
-        "other_fields": "object"
+        "owner_id": "integer",
+        "type": "string",
+        "type_name": "string",
+        "pet_id": "integer",
+        "payment": "decimal",
+        "status": "string"
       }
     }
   ]
