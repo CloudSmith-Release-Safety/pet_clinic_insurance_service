@@ -43,7 +43,11 @@ class PetInsuranceViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer, owner_id):
         serializer.save()
-        generate_billings(serializer.data, owner_id, "insurance", serializer.data.get("insurance_name"))
+        if owner_id:
+            generate_billings(serializer.data, owner_id, "insurance", serializer.data.get("insurance_name"))
+            logger.info(f"Generated billing for owner {owner_id}, pet {serializer.data.get('pet_id')}")
+        else:
+            logger.warning("No owner_id provided, skipping billing generation")
     def send_update_notification(self, instance):
         # Your custom logic to send a notification
         # after the instance is updated
