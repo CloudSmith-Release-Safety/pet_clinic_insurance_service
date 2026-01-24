@@ -6,4 +6,4 @@ RUN mkdir -p /app/tmp && \
     pip install --no-cache-dir django djangorestframework boto3 py_eureka_client psycopg2 requests opentelemetry-api
 
 COPY . /app
-EXPOSE 8000
+EXPOSE 8080
